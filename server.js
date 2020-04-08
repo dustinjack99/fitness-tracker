@@ -2,7 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const path = require("path");
-const db = require("./models/Workout");
+const db = require("./models");
 
 const PORT = process.env.PORT || 3000;
 
@@ -37,9 +37,8 @@ app.get("/exercise?", (req, res) => {
 
 //API ROUTES
 app.get("/api/workouts", (req, res) => {
-  db.find({})
+  db.Workout.find({})
     .then((data) => {
-      console.log(data);
       res.send(data);
     })
     .catch(({ message }) => {
@@ -51,37 +50,32 @@ app.put("/api/workouts/:id", (req, res) => {
   const id = req.params.id;
   const newEx = req.body;
 
-  db.findOneAndUpdate(
-    { _id: id },
+  console.log(req.body);
+
+  db.Workout.update(
+    {
+      _id: id,
+    },
     {
       $push: { exercises: newEx },
-    },
-    { new: true, safe: true, upsert: true }
-  )
-    .then((result) => {
-      return res.status(201).json({
-        status: "Success",
-        message: "Resources Are Created Successfully",
-        data: result,
-      });
-    })
-    .catch((error) => {
-      return res.status(500).json({
-        status: "Failed",
-        message: "Database Error",
-        data: error,
-      });
-    });
+    }
+  ).then((data) => {
+    console.log(data);
+    res.send(data);
+  });
 });
 
 app.post("/api/workouts", (req, res) => {
-  console.log(req.body);
+  db.Workout.create({ db }).then((data) => {
+    console.log(data);
+    res.send(data);
+  });
 });
 
 app.get("/api/workouts/range", (req, res) => {
-  db.find({})
+  db.Workout.find({})
     .then((data) => {
-      res.json(data);
+      res.send(data);
     })
     .catch(({ message }) => {
       console.log(message);
